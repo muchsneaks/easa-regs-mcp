@@ -1,0 +1,30 @@
+[project]
+name = "easa-regs-mcp"
+version = "0.1.0"
+description = "MCP server to search and cite EASA Easy Access Rules (Part-FCL, Air OPS, SERA)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "mcp>=1.10,<2",   # v2 renamed FastMCP -> MCPServer
+    "lxml>=5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+easa-regs-mcp = "easa_regs.server:main"
+easa-regs-fetch = "easa_regs.fetch:main"
+easa-regs-build = "easa_regs.build:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]

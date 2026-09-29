@@ -1,0 +1,71 @@
+name: Update EASA index
+
+# Weekly: download the current EASA Easy Access Rules, rebuild the index, run the full test suite
+# (incl. golden queries on real data) and publish a release when any book changed.
+on:
+  schedule:
+    - cron: "17 5 * * 1"   # Mondays 05:17 UTC
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Publish a release even if nothing changed"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+
+      - name: Fetch EASA XML packages
+        run: easa-regs-fetch
+
+      - name: Build index
+        run: easa-regs-build
+
+      - name: Full test suite on real data
+        run: pytest -q
+
+      - name: Compare with latest release
+        id: diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p prev
+          gh release download --pattern manifest.json --dir prev 2>/dev/null || echo "{}" > prev/manifest.json
+          python - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, pathlib
+          new = json.loads(pathlib.Path("data/manifest.json").read_text())
+          p = pathlib.Path("prev/manifest.json")
+          old = json.loads(p.read_text()) if p.exists() else {}
+          lines = []
+          for code, b in sorted(new.items()):
+              o = old.get(code)
+              if not o:
+                  lines.append(f"- **{code}** added: published {b['pub_time'][:10]}, {b['n_rules']} rules")
+              elif o["pub_time"] != b["pub_time"] or o["n_rules"] != b["n_rules"]:
+                  lines.append(f"- **{code}** updated: {o['pub_time'][:10]} -> {b['pub_time'][:10]}, "
+                               f"{o['n_rules']} -> {b['n_rules']} rules")
+          pathlib.Path("notes.md").write_text(
+              ("## Changes\n" + "\n".join(lines) if lines else "No EASA changes.") +
+              "\n\n## Books\n" + "\n".join(f"- {c}: {b['title']} (published {b['pub_time'][:10]}, {b['n_rules']} rules)"
+                                          for c, b in sorted(new.items())))
+          print(f"changed={'true' if lines else 'false'}")
+          EOF
+
+      - name: Publish release
+        if: steps.diff.outputs.changed == 'true' || inputs.force
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="index-$(date -u +%Y-%m-%d)"
+          gh release create "$TAG" data/easa_regs.sqlite data/manifest.json \
+            --title "EASA index $(date -u +%Y-%m-%d)" --notes-file notes.md --latest
