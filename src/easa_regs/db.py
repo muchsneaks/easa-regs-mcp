@@ -76,7 +76,8 @@ CREATE VIRTUAL TABLE IF NOT EXISTS rules_fts USING fts5(
 """
 
 TYPE_ORDER = "CASE content_type WHEN 'IR' THEN 0 WHEN 'AMC' THEN 1 WHEN 'GM' THEN 2 WHEN 'CS' THEN 3 ELSE 4 END"
-REF_TOKEN = re.compile(r"\b(?:(?:AMC|GM|CS)\d*\s+)?[A-Z]{2,}[A-Z0-9]*(?:\.[A-Z0-9]+)+(?:\([a-z0-9]+\))*", re.I)
+REF_TOKEN = re.compile(
+    r"\b(?:(?:AMC|GM|CS)\d*\s+)?(?:[A-Z]{2,}[A-Z0-9]*|\d{2,3}\.[A-Z]{1,2})(?:\.[A-Z0-9]+)+(?:\([a-z0-9]+\))*", re.I)
 
 
 def db_path() -> Path:

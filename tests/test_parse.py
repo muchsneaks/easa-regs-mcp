@@ -16,6 +16,9 @@ from easa_regs.parse import norm_ref, parse_book, short_type, split_ref
     ("GM1 CS FTL.1.205(d) Flight Duty Period", "GM1 CS FTL.1.205(d)", "Flight Duty Period"),
     ("Multi-pilot operations", "Multi-pilot operations", ""),
     ("Signature", "Signature", ""),
+    ("66.A.70 Conversion provisions", "66.A.70", "Conversion provisions"),
+    ("AMC1 145.A.30(e) Personnel requirements", "AMC1 145.A.30(e)", "Personnel requirements"),
+    ("ML.A.803 Pilot-owner authorisation", "ML.A.803", "Pilot-owner authorisation"),
 ])
 def test_split_ref(title, ref, heading):
     assert split_ref(title) == (ref, heading)

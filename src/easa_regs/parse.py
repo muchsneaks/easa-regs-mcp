@@ -74,7 +74,8 @@ class ParsedBook:
 
 _PREFIX = re.compile(r"^(?:AMC|GM|CS|AMC-GM)\d*$")
 # 'FCL.740(b)', 'ORO.GEN.310(b);(d)', 'NCC.IDE.A.120&NCC.IDE.A.125', 'Part-FCL'
-_DOTTED = re.compile(r"^(?:[A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*\.[A-Za-z0-9]\S*|Part-[A-Z]{2,}\S*)$")
+# also Part-66/145/21 style: '66.A.70', '145.A.30', '21.A.3'
+_DOTTED = re.compile(r"^(?:[A-Z][A-Za-z0-9]*(?:-[A-Za-z0-9]+)*\.[A-Za-z0-9]\S*|\d{2,3}\.[A-Z]{1,2}\.\S+|Part-[A-Z0-9]{2,}\S*)$")
 _NUMBERISH = re.compile(r"^(?:\d+[a-z]?|[IVXLC]+|[A-Z])(?:\([^)\s]*\))*[;,]?$")
 _KEYWORDS = {"Article", "Appendix", "Annex", "ANNEX", "Section", "SECTION", "SUBJECT"}
 
