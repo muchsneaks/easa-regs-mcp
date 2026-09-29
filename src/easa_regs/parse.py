@@ -33,8 +33,10 @@ ER = f"{{{NS['er']}}}"
 
 SKIP_TYPES = {
     "disclaimer", "list of revisions", "note from the editor", "table of contents",
-    "incorporated amendments", "easy access rules", "n/a", "",
+    "incorporated amendments", "easy access rules", "n/a",
 }
+# some books (e.g. Basic Regulation) leave TypeOfContent empty - skip their front matter by title
+FRONTMATTER_TITLES = SKIP_TYPES | {"easa erules", "cover page", "foreword"}
 
 
 @dataclass
@@ -128,7 +130,17 @@ def short_type(full: str) -> str:
         return "GM"
     if first.startswith("cs"):
         return "CS"
-    if first.startswith("delegated") or "regulation" in first:
+    if first.startswith("delegated") or first.startswith("dr ") or "regulation" in first:
+        return "IR"
+    return "OTHER"
+
+
+def _type_from_title(title: str, ref: str) -> str:
+    """Fallback when EASA left TypeOfContent empty."""
+    m = re.match(r"^(?:Appendix \S* ?to )?(AMC|GM|CS)\d*\b", title)
+    if m:
+        return m.group(1)
+    if re.match(r"^(Article|ANNEX|Annex|Appendix)\b", title) or ref != title:
         return "IR"
     return "OTHER"
 
@@ -281,9 +293,9 @@ def parse_book(path: Path | str, code: str) -> ParsedBook:
     seq = 0
     for topic, crumbs in _walk_toc(er_doc, []):
         ctype_full = (topic.get("TypeOfContent") or "").strip()
-        if ctype_full.rstrip(";").strip().lower() in SKIP_TYPES:
-            continue
         title = re.sub(r"\s+", " ", topic.get("source-title") or "").strip()
+        if ctype_full.rstrip(";").strip().lower() in SKIP_TYPES or title.lower() in FRONTMATTER_TITLES:
+            continue
         sdt = sdts.get(topic.get("sdt-id", ""))
         text, meta = topic_text(sdt, title) if sdt is not None else ("", {})
         if not title and not text:
@@ -299,7 +311,7 @@ def parse_book(path: Path | str, code: str) -> ParsedBook:
             title=title,
             ref=ref,
             heading=heading,
-            content_type=short_type(ctype_full),
+            content_type=short_type(ctype_full) if ctype_full.strip(" ;") else _type_from_title(title, ref),
             content_type_full=ctype_full.rstrip(";"),
             parent_ir=(topic.get("ParentIR") or "").strip(),
             regulatory_source=(topic.get("RegulatorySource") or meta.get("regulatory_source_text", "")).strip(),

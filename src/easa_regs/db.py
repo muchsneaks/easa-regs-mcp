@@ -131,6 +131,10 @@ STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "does", "for", "from", "how", "i", "in",
     "is", "it", "my", "of", "on", "or", "the", "to", "what", "when", "which", "who", "with", "under",
     "rule", "rules", "requirement", "requirements", "easa", "regulation",
+    # German filler words (the expansion table handles the content words)
+    "voraussetzungen", "anforderungen", "regeln", "regel", "was", "wie", "wann", "welche", "welcher", "ich",
+    "muss", "brauche", "darf", "für", "fuer", "mit", "bei", "von", "und", "oder", "der", "die", "das", "ein",
+    "eine", "im", "in", "zu", "nach", "laut", "gilt", "gelten",
 }
 
 
@@ -164,13 +168,13 @@ EXPANSIONS = {
     "ausweichflugplatz": "alternate aerodrome", "flugschüler": "student pilot", "alleinflug": "solo",
     "kunstflug": "aerobatic", "schleppberechtigung": "towing rating", "segelflug": "sailplane",
     "segelflugzeug": "sailplane", "motorsegler": "touring motor glider", "wetter": "meteorological",
-    "gültigkeit": "validity", "voraussetzungen": "prerequisites", "ausbildung": "training",
+    "gültigkeit": "validity", "ausbildung": "training",
     "flugstunden": "flight time", "flugzeit": "flight time", "landungen": "landings", "starts": "take-offs",
     "befähigungsüberprüfung": "proficiency check", "prüfungsflug": "skill test", "theorieprüfung":
     "theoretical knowledge examination", "flugzeug": "aeroplane", "hubschrauber": "helicopter",
     "notsender": "emergency locator transmitter", "schwimmwesten": "life-jackets",
     "kommandant": "pilot-in-command", "flugschule": "training organisation", "lizenz": "licence",
-    "berechtigung": "rating", "rechte": "privileges", "anforderungen": "requirements",
+    "berechtigung": "rating", "rechte": "privileges",
     "übungsflug": "training flight", "auffrischungsschulung": "refresher training",
     "erfahrung": "experience", "vorflug": "pre-flight", "flugvorbereitung": "flight preparation",
     "nacht": "night", "tag": "day", "gäste": "passengers", "dauer": "duration",
@@ -245,8 +249,14 @@ SPECIFIC_HINTS = re.compile(
     r"airline|operator|gewerblich)\b", re.I)
 
 
+NICHE_BOOKS = {"SAILPLANES", "BALLOONS", "UAS", "AERODROMES"}
+NICHE_HINTS = re.compile(
+    r"\b(sailplanes?|gliders?|glid\w*|segelf\w*|SFCL|SAO|TMG|balloons?|ballon\w*|BFCL|BOP|drones?|drohne\w*|UAS|"
+    r"UAV|unmanned|aerodrome operator|ADR|flugplatzbetreiber)\b", re.I)
+
+
 def _rerank_score(row: sqlite3.Row, groups: list, best: float, authority_query: bool = False,
-                  specific_query: bool = False) -> float:
+                  specific_query: bool = False, niche_books_query: bool = False) -> float:
     """bm25 is dominated by long texts; reward rules whose title/location carry the query terms."""
     rel = row["rank"] / best if best else 0.0          # 1.0 for the best bm25 hit
     if not groups:
@@ -260,6 +270,9 @@ def _rerank_score(row: sqlite3.Row, groups: list, best: float, authority_query: 
     # most users are pilots/organisations: authority-side rules (ARA/ARO) only when asked for
     if not authority_query and re.match(r"^(?:(?:AMC|GM)\d*\s+)?AR[AO]\.", row["ref"] or ""):
         score -= 1.0
+    # sailplane/balloon/drone/aerodrome books only win when the question is about them
+    if not niche_books_query and row["book"] in NICHE_BOOKS:
+        score -= 0.6
     # operation-specific parts (CAT, SPO, SPA, IAM, NCC) only win when the question is about them
     if not specific_query and re.match(r"^(?:(?:AMC|GM)\d*\s+)?(?:CAT|SPO|SPA|UAM|NCC)\.", row["ref"] or ""):
         score -= 0.5
@@ -301,6 +314,7 @@ def search(con, query: str, book=None, content_type=None, limit: int = 8) -> lis
     groups = _groups(query)
     authority_query = bool(AUTHORITY_HINTS.search(query))
     specific_query = bool(SPECIFIC_HINTS.search(query))
+    niche_books_query = bool(NICHE_HINTS.search(query)) or (book or "").upper() in NICHE_BOOKS
     fq = _fts_query(query, "OR")
     if fq and len(results) < limit:
         rows = con.execute(
@@ -311,7 +325,8 @@ def search(con, query: str, book=None, content_type=None, limit: int = 8) -> lis
             [fq, *fargs],
         ).fetchall()
         best = min((r["rank"] for r in rows), default=0.0)
-        for row in sorted(rows, key=lambda r: _rerank_score(r, groups, best, authority_query, specific_query),
+        for row in sorted(rows, key=lambda r: _rerank_score(r, groups, best, authority_query, specific_query,
+                                                           niche_books_query),
                           reverse=True):
             if len(results) >= limit:
                 break
