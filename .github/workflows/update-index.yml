@@ -77,10 +77,11 @@ jobs:
           EOF
 
       - name: Publish release
-        if: steps.diff.outputs.changed == 'true' || inputs.force
+        # new EASA data, or parser/sources changed (push), or manual force
+        if: steps.diff.outputs.changed == 'true' || github.event_name == 'push' || inputs.force
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="index-$(date -u +%Y-%m-%d)"
+          TAG="index-$(date -u +%Y-%m-%d-%H%M)"
           gh release create "$TAG" data/easa_regs.sqlite data/manifest.json \
             --title "EASA index $(date -u +%Y-%m-%d)" --notes-file notes.md --latest
