@@ -246,7 +246,7 @@ def _load_parts(path: Path) -> tuple[etree._Element, etree._Element]:
             if name == "/word/document.xml":
                 w_doc = part.find(f"pkg:xmlData/{W}document", NS)
                 continue
-            if er_doc is None and name.startswith("/customXml/item"):
+            if er_doc is None and name.lower().startswith("/customxml/item"):  # EASA uses both cases
                 found = part.find(f"pkg:xmlData/{ER}document", NS)
                 if found is not None:
                     er_doc = found

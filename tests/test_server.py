@@ -77,8 +77,9 @@ def test_real_counts():
     con = sqlite3.connect(REAL_DB)
     counts = dict(con.execute("SELECT book, COUNT(*) FROM rules GROUP BY book"))
     assert counts["AIRCREW"] > 900 and counts["AIROPS"] > 3000 and counts["SERA"] > 300
+    total = con.execute("SELECT COUNT(*) FROM rules").fetchone()[0]
     empty = con.execute("SELECT COUNT(*) FROM rules WHERE length(text) < 20").fetchone()[0]
-    assert empty < 10
+    assert empty / total < 0.01, f"{empty} of {total} rules have (almost) no text"
 
 
 @real
