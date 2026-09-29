@@ -25,8 +25,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
@@ -35,10 +35,16 @@ jobs:
         run: easa-regs-fetch
 
       - name: Build index
-        run: easa-regs-build --keep-going
+        run: |
+          easa-regs-build --keep-going
+          if [ -f data/build_errors.txt ]; then while read -r l; do echo "::warning::$l"; done < data/build_errors.txt; fi
 
       - name: Full test suite on real data
-        run: pytest -q
+        run: |
+          set -o pipefail
+          pytest -q -rf --tb=line 2>&1 | tee pytest.log || {
+            grep -E "^(FAILED|ERROR)|Error|assert" pytest.log | head -20 | while read -r l; do echo "::error::$l"; done
+            exit 1; }
 
       - name: Compare with latest release
         id: diff
