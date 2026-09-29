@@ -38,7 +38,7 @@ The index is rebuilt weekly from EASA's official XML by a GitHub Action and publ
 
 ## Install
 
-Needs Python 3.10+. The first start downloads the prebuilt index (~25 MB) from the latest release.
+Needs Python 3.10+. The first start downloads the prebuilt index (~33 MB) from the latest release and refreshes it weekly.
 
 **Claude Desktop** (Settings > Developer > Edit Config), using [uv](https://docs.astral.sh/uv/):
 

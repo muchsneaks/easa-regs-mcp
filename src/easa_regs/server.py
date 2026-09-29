@@ -8,7 +8,10 @@ Run:
 from __future__ import annotations
 
 import argparse
+import os
 import sqlite3
+import sys
+import time
 from functools import lru_cache
 from typing import Annotated, Literal
 
@@ -50,6 +53,14 @@ ContentType = Literal["IR", "AMC", "GM", "CS"]
 @lru_cache(maxsize=1)
 def _con() -> sqlite3.Connection:
     path = db.db_path()
+    # installed copies (not a repo checkout, no EASA_REGS_DB override) refresh the prebuilt index weekly
+    managed = path == db.DEFAULT_DB and not (db._REPO_ROOT / "pyproject.toml").exists()
+    if managed and path.exists() and time.time() - path.stat().st_mtime > 7 * 86400:
+        try:
+            download_index(path)
+        except Exception as exc:
+            print(f"Index refresh failed, using existing copy: {exc}", file=sys.stderr)
+            os.utime(path)  # don't retry on every start
     if not path.exists():
         try:
             download_index(path)
