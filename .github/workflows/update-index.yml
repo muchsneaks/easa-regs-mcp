@@ -3,6 +3,12 @@ name: Update EASA index
 # Weekly: download the current EASA Easy Access Rules, rebuild the index, run the full test suite
 # (incl. golden queries on real data) and publish a release when any book changed.
 on:
+  push:
+    branches: [main]
+    paths:
+      - "src/easa_regs/sources.py"
+      - "src/easa_regs/parse.py"
+      - ".github/workflows/update-index.yml"
   schedule:
     - cron: "17 5 * * 1"   # Mondays 05:17 UTC
   workflow_dispatch:
