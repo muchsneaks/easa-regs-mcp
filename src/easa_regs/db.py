@@ -16,9 +16,13 @@ from .sources import BOOKS
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
+def _is_checkout() -> bool:
+    return (_REPO_ROOT / ".git").exists() or (_REPO_ROOT / "setup.sh").exists()
+
+
 def _default_db() -> Path:
-    """Repo checkout -> <repo>/data; installed package (pip/uvx) -> per-user data dir."""
-    if (_REPO_ROOT / "pyproject.toml").exists():
+    """Repo checkout -> <repo>/data; installed package (pip/uvx/.mcpb bundle) -> per-user data dir."""
+    if _is_checkout():
         return _REPO_ROOT / "data" / "easa_regs.sqlite"
     if sys.platform == "darwin":
         base = Path.home() / "Library" / "Application Support"

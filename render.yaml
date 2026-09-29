@@ -1,0 +1,12 @@
+# One-click deploy: https://render.com/deploy?repo=https://github.com/muchsneaks/easa-regs-mcp
+services:
+  - type: web
+    name: easa-regs-mcp
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: HOST
+        value: 0.0.0.0

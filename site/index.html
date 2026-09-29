@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>easa-regs – Die EASA-Regeln in deiner KI</title>
+<meta name="description" content="Verbinde Claude mit 9.098 EASA-Regeln: Part-FCL, Air OPS, SERA, Part-ML und mehr. Präzise Antworten mit wörtlichem Zitat und Fundstelle. Kostenlos und Open Source.">
+<meta property="og:title" content="easa-regs – Die EASA-Regeln in deiner KI">
+<meta property="og:description" content="Präzise Antworten. Wörtlich zitiert. Immer aktuell. Kostenloser MCP-Server für Claude.">
+<meta property="og:image" content="https://muchsneaks.github.io/easa-regs-mcp/assets/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<link rel="preload" href="assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Geist;src:url(assets/fonts/Geist-Variable.woff2) format("woff2");font-weight:100 900;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url(assets/fonts/GeistMono-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
+:root{--black:#000;--ink:#1D1D1F;--grey:#6E6E73;--grey-d:#A1A1A6;--line:#D2D2D7;--panel:#F5F5F7;--blue:#0066D6;--blue-d:#2997FF;--card-d:#161617;--line-d:#2C2C2E;--green:#30D158}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:56px}
+body{margin:0;background:#fff;color:var(--ink);font-family:Geist,-apple-system,"Helvetica Neue",Arial,sans-serif;font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+.mono,code,pre{font-family:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.h{font-weight:600;letter-spacing:-.035em;margin:0}
+.wrap{width:min(980px,100% - 48px);margin-inline:auto}
+.wide{width:min(1180px,100% - 32px);margin-inline:auto}
+.center{text-align:center}
+.nw{white-space:nowrap}
+.sub{color:var(--grey);font-size:clamp(19px,2vw,24px);line-height:1.45;letter-spacing:-.01em;max-width:720px;margin:24px auto 0}
+.dark{background:#000;color:#F5F5F7}.dark .sub{color:var(--grey-d)}
+.panel{background:var(--panel)}
+section{padding:clamp(88px,11vw,160px) 0}
+h2.h{font-size:clamp(40px,6vw,80px);line-height:1.05}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:12px 24px;border-radius:99px;background:var(--blue);color:#fff;font-weight:500;font-size:17px;border:0;cursor:pointer;font-family:inherit}
+.btn:hover{text-decoration:none;background:#0058BA}
+.btn.ghost{background:transparent;color:var(--blue);padding-inline:6px}
+.dark .btn.ghost{color:var(--blue-d)}
+.btn.light{background:#F5F5F7;color:var(--ink)}
+sup{font-size:.55em;line-height:0}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;height:52px;background:rgba(0,0,0,.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+.nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;color:#F5F5F7;font-weight:600;font-size:16px;letter-spacing:-.01em}
+.logo:hover{text-decoration:none}
+.logo img{width:22px;height:22px;border-radius:6px}
+.links{display:flex;gap:34px;font-size:13px}
+.links a{color:#E8E8ED}
+.nav .btn{min-height:30px;padding:5px 14px;font-size:12px}
+.menu{display:none;width:44px;height:44px;background:none;border:0;color:#E8E8ED;cursor:pointer;align-items:center;justify-content:center}
+.drawer{display:none;position:fixed;inset:52px 0 auto 0;background:rgba(0,0,0,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 24px 28px;z-index:49}
+.drawer a{display:block;padding:14px 0;color:#F5F5F7;font-size:24px;font-weight:600;letter-spacing:-.02em;border-bottom:1px solid var(--line-d)}
+.drawer.open{display:block}
+
+/* hero */
+.hero{padding:clamp(72px,9vw,112px) 0 0;text-align:center;overflow:hidden}
+.hero .name{font-size:clamp(19px,2vw,24px);font-weight:600}
+.hero h1{font-size:clamp(50px,8.4vw,112px);line-height:1.02;margin:12px 0 0}
+.hero .sub{margin-top:22px}
+.cta{margin-top:34px;display:flex;gap:28px;justify-content:center;align-items:center;flex-wrap:wrap}
+.window{width:min(980px,100% - 32px);margin:clamp(56px,7vw,88px) auto 0;background:var(--card-d);border:1px solid var(--line-d);border-bottom:0;border-radius:28px 28px 0 0;box-shadow:0 -40px 120px -20px rgba(41,151,255,.18);text-align:left;overflow:hidden}
+.bar{height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line-d);font-size:13px;color:var(--grey-d)}
+.dots{display:flex;gap:8px}.dots i{width:12px;height:12px;border-radius:99px;background:#3A3A3C}
+.live{display:flex;align-items:center;gap:8px}
+.pulse{position:relative;width:8px;height:8px}
+.pulse:before,.pulse:after{content:"";position:absolute;inset:0;border-radius:99px;background:var(--green)}
+.pulse:before{animation:ping 2.2s cubic-bezier(0,0,.2,1) infinite}
+.chat{padding:clamp(24px,4vw,44px) clamp(18px,6vw,72px) clamp(28px,4vw,56px);display:flex;flex-direction:column;gap:24px}
+.q{align-self:flex-end;max-width:520px;background:var(--line-d);border-radius:22px;padding:14px 20px;font-size:clamp(16px,1.7vw,20px);line-height:1.4}
+.tool{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--grey-d)}
+.ans{font-size:clamp(17px,1.9vw,22px);line-height:1.5;max-width:760px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.fact{background:var(--ink);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+.fact b{font-size:clamp(26px,3vw,34px);font-weight:600;letter-spacing:-.035em}
+.fact span{font-size:15px;color:var(--grey-d)}
+.cite{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line-d);font-size:15px;color:var(--grey-d)}
+.cite .mono{color:#F5F5F7}
+.s1{animation:fade .6s ease 1.5s both}.s2{animation:fade .6s ease 2.2s both}.s3{animation:fade .6s ease 2.8s both}.s4{animation:fade .6s ease 3.4s both}.s5{animation:fade .6s ease 4s both}
+.l1{animation:rise 1s cubic-bezier(.16,1,.3,1) .1s both}.l2{animation:rise 1s cubic-bezier(.16,1,.3,1) .25s both}.l3{animation:rise 1s cubic-bezier(.16,1,.3,1) .4s both}.l4{animation:rise 1s cubic-bezier(.16,1,.3,1) .55s both}
+.lift{animation:lift 1.4s cubic-bezier(.16,1,.3,1) .6s both}
+
+/* stats */
+.stats{margin:clamp(64px,8vw,112px) auto 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:56px;width:min(1100px,100% - 48px)}
+.stat{text-align:center;display:flex;flex-direction:column;gap:12px}
+.stat b{font-size:clamp(60px,7vw,88px);font-weight:600;letter-spacing:-.04em;line-height:1}
+.stat span{font-size:clamp(16px,1.5vw,19px);color:var(--grey)}
+
+/* bento */
+.bento{margin-top:clamp(48px,6vw,80px);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:20px}
+.tile{background:#fff;border-radius:30px;padding:clamp(28px,3.4vw,46px);display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:340px;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.tile:hover{transform:scale(1.012)}
+.tile.d{background:#000;color:#F5F5F7}
+.tile h3{font-size:clamp(26px,2.6vw,34px)}
+.tile p{margin:8px 0 0;color:var(--grey);font-size:17px}
+.tile.d p{color:var(--grey-d)}
+.span4{grid-column:span 4}.span3{grid-column:span 3}.span2{grid-column:span 2}
+.quote{font-size:clamp(28px,3vw,38px);line-height:1.25;letter-spacing:-.02em}.quote i{font-style:normal;color:#C7C7CC}
+.big{font-size:clamp(72px,7vw,96px);font-weight:600;letter-spacing:-.045em;line-height:.95}
+.ref{font-size:clamp(24px,2.3vw,30px);line-height:1.3;letter-spacing:-.02em}.ref em{font-style:normal;color:var(--blue)}
+.types{display:flex;flex-direction:column;gap:12px}
+.types div{display:flex;align-items:center;gap:14px}
+.tag{width:54px;padding:5px 0;text-align:center;border-radius:8px;font-size:14px}
+.week{display:flex;gap:10px}
+.week div{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px;color:var(--grey)}
+.week i{width:44px;height:44px;border-radius:99px;background:#E8E8ED;position:relative}
+.week .mo i{background:var(--blue)}.week .mo{color:var(--blue);font-weight:600}
+.week .mo i:before{content:"";position:absolute;inset:0;border-radius:99px;background:var(--blue);animation:ping 2.2s cubic-bezier(0,0,.2,1) infinite;opacity:.25}
+.translate{display:flex;align-items:center;gap:18px;flex-wrap:wrap;font-size:clamp(20px,2.2vw,26px);letter-spacing:-.02em}
+.translate svg{animation:slide 2.8s ease-in-out infinite}
+
+/* books */
+.books{margin:clamp(56px,7vw,96px) auto 0;width:min(980px,100% - 48px);border-top:1px solid var(--line-d)}
+.book{display:flex;align-items:baseline;gap:32px;padding:24px 0;border-bottom:1px solid var(--line-d)}
+.book b{flex:1;font-size:clamp(24px,3vw,40px);font-weight:600;letter-spacing:-.03em}
+.book span{width:360px;font-size:16px;color:#86868B}
+.book .mono{width:80px;text-align:right;color:#F5F5F7;font-size:16px}
+
+/* install */
+.tabs{margin:clamp(48px,6vw,72px) auto 0;width:min(860px,100% - 32px)}
+.tablist{display:flex;gap:6px;padding:6px;background:var(--panel);border-radius:99px;overflow-x:auto;scrollbar-width:none}
+.tablist::-webkit-scrollbar{display:none}
+.tablist button{flex:1;min-height:44px;padding:10px 18px;border:0;border-radius:99px;background:transparent;font:inherit;font-size:15px;font-weight:500;color:var(--ink);cursor:pointer;white-space:nowrap}
+.tablist button[aria-selected=true]{background:#fff;box-shadow:0 2px 10px -4px rgba(0,0,0,.2)}
+.panelbox{margin-top:20px;background:var(--panel);border-radius:28px;padding:clamp(24px,4vw,44px)}
+.panelbox[hidden]{display:none}
+.panelbox h3{font-size:clamp(24px,2.6vw,30px)}
+.panelbox .lead{color:var(--grey);margin:8px 0 0}
+.copyrow{margin-top:24px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px 8px 8px 18px}
+.copyrow code{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;font-size:15px;scrollbar-width:thin}
+.copy{min-height:40px;padding:8px 16px;border-radius:12px;border:0;background:var(--ink);color:#fff;font:inherit;font-size:14px;font-weight:500;cursor:pointer;flex-shrink:0}
+.copy.done{background:#248A3D}
+pre.block{margin:24px 0 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px;font-size:14px;line-height:1.7;overflow-x:auto}
+.blockwrap{position:relative}.blockwrap .copy{position:absolute;top:10px;right:10px}
+ol.steps{margin:28px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:14px}
+ol.steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start}
+ol.steps li:before{content:counter(s);flex-shrink:0;width:28px;height:28px;border-radius:99px;background:var(--ink);color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.note{margin-top:22px;font-size:15px;color:var(--grey)}
+.soon{margin-top:24px;padding:18px 20px;border-radius:16px;background:#fff;border:1px dashed var(--line);color:var(--grey)}
+.dl{margin-top:26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.dl .btn svg{flex-shrink:0}
+
+/* try */
+.prompts{margin:clamp(40px,5vw,64px) auto 0;width:min(860px,100% - 32px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.prompt{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 22px 18px;display:flex;flex-direction:column;justify-content:space-between;gap:18px;font-size:18px;line-height:1.4;letter-spacing:-.01em}
+.prompt .copy{align-self:flex-start;background:transparent;color:var(--blue);padding:0;min-height:32px}
+.prompt .copy.done{color:#248A3D;background:transparent}
+
+/* faq */
+.faq{margin:clamp(40px,5vw,64px) auto 0;width:min(860px,100% - 48px);border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;padding:22px 36px 22px 0;font-size:clamp(18px,1.8vw,21px);font-weight:600;letter-spacing:-.015em;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";position:absolute;right:4px;top:18px;font-size:26px;font-weight:400;color:var(--grey);transition:transform .3s}
+.faq details[open] summary:after{transform:rotate(45deg)}
+.faq details p{margin:0 0 22px;color:var(--grey);max-width:720px}
+
+/* footer */
+footer{background:var(--panel);padding:0 0 44px;font-size:12px;line-height:1.6;color:var(--grey)}
+footer .wrap{border-top:1px solid var(--line);padding-top:22px;display:flex;flex-direction:column;gap:8px}
+footer .bottom{margin-top:12px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer .bottom a{color:#424245;margin-left:20px}footer .bottom a:first-child{margin-left:0}
+
+/* motion */
+@keyframes rise{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes lift{from{opacity:0;transform:translateY(80px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.6);opacity:0}}
+@keyframes slide{0%,20%{transform:translateX(0);opacity:1}45%,55%{transform:translateX(10px);opacity:.5}80%,100%{transform:translateX(0);opacity:1}}
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.js .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}}
+
+/* responsive */
+@media (max-width:1068px){.span4,.span2{grid-column:span 3}.book span{width:260px}}
+@media (max-width:734px){
+.links,.nav .btn{display:none}.menu{display:flex}
+.facts{grid-template-columns:1fr}.fact{flex-direction:row;align-items:baseline;gap:12px}.fact b{width:96px;flex-shrink:0}
+.stats{grid-template-columns:1fr;gap:48px}
+.bento{grid-template-columns:1fr;gap:14px}.span4,.span3,.span2{grid-column:auto}.tile{min-height:0;border-radius:26px}
+.book{flex-wrap:wrap;gap:4px 16px;padding:18px 0}.book b{flex:1 1 auto}.book span{order:3;width:100%;font-size:14px}.book .mono{width:auto;font-size:14px}
+.prompts{grid-template-columns:1fr}
+.cite{flex-direction:column;gap:6px}
+.cta{flex-direction:column;gap:16px}
+.tablist{display:grid;grid-template-columns:1fr 1fr;border-radius:24px}.tablist button{padding:10px 8px;font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Hauptnavigation">
+<div class="wrap">
+<a class="logo" href="#top"><img src="assets/icon.png" alt="">easa-regs</a>
+<div class="links"><a href="#precision">Funktionen</a><a href="#books">Regelwerke</a><a href="#install">Verbinden</a><a href="#faq">FAQ</a><a href="https://github.com/muchsneaks/easa-regs-mcp">GitHub</a></div>
+<a class="btn" href="#install">Mit Claude verbinden</a>
+<button class="menu" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="drawer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9h16M4 15h16"/></svg></button>
+</div>
+</nav>
+<div class="drawer" id="drawer"><a href="#precision">Funktionen</a><a href="#books">Regelwerke</a><a href="#install">Mit Claude verbinden</a><a href="#faq">FAQ</a><a href="https://github.com/muchsneaks/easa-regs-mcp">GitHub</a></div>
+
+<main>
+<!-- HERO -->
+<header id="top" class="hero dark">
+<div class="name l1">easa-regs</div>
+<h1 class="h l2">Die <span class="nw">EASA-Regeln.</span><br>In deiner KI.</h1>
+<p class="sub l3">Präzise Antworten. Wörtlich zitiert. Immer aktuell.</p>
+<div class="cta l4"><a class="btn" href="#install">Kostenlos mit Claude verbinden</a><a class="btn ghost" href="#precision">Mehr erfahren ›</a></div>
+<div class="window lift" role="img" aria-label="Beispiel: Claude beantwortet eine Frage zur SEP-Verlängerung mit Zitat aus FCL.740.A">
+<div class="bar"><div class="dots"><i></i><i></i><i></i></div><span>Claude</span><span class="live"><span class="pulse"></span>easa-regs verbunden</span></div>
+<div class="chat">
+<div class="q s1">Wie verlängere ich meine SEP-Klasse durch Erfahrung?</div>
+<div class="tool s2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>FCL.740.A im Regelwerk Aircrew gelesen</div>
+<div class="ans s3">In den 12 Monaten vor Ablauf brauchst du 12 Stunden in der Klasse. Davon:</div>
+<div class="facts s4">
+<div class="fact"><b>6 Std.</b><span>als PIC</span></div>
+<div class="fact"><b>12 / 12</b><span>Starts und Landungen</span></div>
+<div class="fact"><b>1 Std.</b><span>Übungsflug mit FI oder CRI</span></div>
+</div>
+<div class="cite s5"><span><span class="mono">FCL.740.A(b)(1)(ii)</span> · verbindlich (IR) · Stand 25.11.2025</span><span>Originaltext anzeigen ›</span></div>
+</div>
+</div>
+</header>
+
+<!-- PROBLEM -->
+<section>
+<div class="wrap center">
+<h2 class="h rv">KI rät. Die Luftfahrt verlangt Gewissheit.</h2>
+<p class="sub rv">Sprachmodelle klingen überzeugend, auch wenn sie falsch liegen. Bei Lizenzen, Minima und Betriebsregeln zählt nur der geltende Wortlaut.</p>
+</div>
+<div class="stats">
+<div class="stat rv"><b>bis 88 %</b><span>falsche Antworten großer Sprachmodelle bei konkreten Rechtsfragen.<sup>1</sup></span></div>
+<div class="stat rv"><b>17–33 %</b><span>selbst bei spezialisierten juristischen KI-Tools mit Quellenanbindung.<sup>2</sup></span></div>
+<div class="stat rv"><b>82,7 %</b><span>Trefferquote des besten Modells bei Luftfahrtwissen. Fachleute: rund 95 %.<sup>3</sup></span></div>
+</div>
+</section>
+
+<!-- PRECISION -->
+<section id="precision" class="panel">
+<div class="wrap center"><h2 class="h rv">Gebaut für Präzision.</h2></div>
+<div class="wide bento">
+<article class="tile span4 rv"><div><h3 class="h">Wörtlich zitiert.</h3><p>Claude liest den offiziellen EASA-Text, bevor es antwortet. Nichts wird aus dem Gedächtnis zusammengesetzt.</p></div><div class="quote"><i>“</i>(B) 12 take-offs and 12 landings;<i>”</i></div></article>
+<article class="tile d span2 rv"><span style="color:var(--grey-d)">Abgedeckt</span><div><div class="big">9.098</div><p>Regeln aus 9 EASA-Regelwerken.</p></div></article>
+<article class="tile span2 rv"><div><h3 class="h">Mit Fundstelle.</h3><p>Bis auf den Unterpunkt, prüfbar in Sekunden.</p></div><div class="ref mono">FCL.740.A<br><em>(b)(1)(ii)</em></div></article>
+<article class="tile span2 rv"><div><h3 class="h">Verbindlich oder nicht?</h3><p>Jede Regel trägt ihren Rechtscharakter.</p></div>
+<div class="types"><div><span class="tag mono" style="background:var(--ink);color:#fff">IR</span>Verbindliche Vorschrift</div><div><span class="tag mono" style="background:var(--line)">AMC</span>Anerkannter Nachweisweg</div><div><span class="tag mono" style="border:1px solid var(--line);padding:4px 0">GM</span>Erläuterung</div></div></article>
+<article class="tile span2 rv"><div><h3 class="h">Jeden Montag aktuell.</h3><p>Automatischer Abgleich mit den offiziellen EASA-Daten.</p></div>
+<div class="week" aria-hidden="true"><div class="mo"><i></i>Mo</div><div><i></i>Di</div><div><i></i>Mi</div><div><i></i>Do</div><div><i></i>Fr</div></div></article>
+<article class="tile span3 rv"><div><h3 class="h">Frag, wie du sprichst.</h3><p>Deutsch, Englisch, Abkürzungen. easa-regs findet die Regel.</p></div>
+<div class="translate"><span>Nachtflugberechtigung</span><svg width="36" height="20" viewBox="0 0 36 20" fill="none" stroke="#0066D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 10h30M24 3l8 7-8 7"/></svg><span class="mono" style="color:var(--blue)">FCL.810</span></div></article>
+<article class="tile d span3 rv"><div><h3 class="h">Open Source. Kostenlos.</h3><p>Jede Zeile Code offen einsehbar. Keine Anmeldung, kein Abo.</p></div><a href="https://github.com/muchsneaks/easa-regs-mcp" style="color:var(--blue-d);font-size:19px">Auf GitHub ansehen ›</a></article>
+</div>
+</section>
+
+<!-- BOOKS -->
+<section id="books" class="dark">
+<div class="wrap center">
+<h2 class="h rv">Alle Regelwerke.<br>Eine Frage entfernt.</h2>
+<p class="sub rv">Allein Air Operations umfasst 2.566 Seiten.<sup>4</sup> Claude kennt jetzt jede davon.</p>
+</div>
+<div class="books">
+<div class="book rv"><b>Air Operations</b><span>ORO, CAT, NCO, NCC, SPO, SPA, IAM, FTL</span><span class="mono">3.640</span></div>
+<div class="book rv"><b>Continuing Airworthiness</b><span>Part-M, Part-ML, Part-145, Part-CAMO</span><span class="mono">1.301</span></div>
+<div class="book rv"><b>Aerodromes</b><span>Flugplätze, (EU) 139/2014</span><span class="mono">1.203</span></div>
+<div class="book rv"><b>Aircrew</b><span>Part-FCL, Part-MED, ARA, ORA, DTO</span><span class="mono">992</span></div>
+<div class="book rv"><b>Balloons</b><span>Part-BFCL, Part-BOP</span><span class="mono">603</span></div>
+<div class="book rv"><b>Sailplanes</b><span>Part-SFCL, Part-SAO</span><span class="mono">543</span></div>
+<div class="book rv"><b>SERA</b><span>Luftverkehrsregeln, Luftraum, VFR/IFR</span><span class="mono">361</span></div>
+<div class="book rv"><b>Drohnen (UAS)</b><span>Offene und spezielle Kategorie</span><span class="mono">301</span></div>
+<div class="book rv"><b>Basic Regulation</b><span>Grundverordnung (EU) 2018/1139</span><span class="mono">154</span></div>
+</div>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+<div class="wrap center">
+<h2 class="h rv">In einer Minute verbunden.</h2>
+<p class="sub rv">Wähle, wo du Claude nutzt. Kein Konto, keine Kosten.</p>
+</div>
+<div class="tabs rv">
+<div class="tablist" role="tablist" aria-label="Wo nutzt du Claude?">
+<button role="tab" id="t-claude" aria-controls="p-claude" aria-selected="true">Claude App &amp; Web</button>
+<button role="tab" id="t-desktop" aria-controls="p-desktop" aria-selected="false" tabindex="-1">Claude Desktop</button>
+<button role="tab" id="t-code" aria-controls="p-code" aria-selected="false" tabindex="-1">Claude Code</button>
+<button role="tab" id="t-other" aria-controls="p-other" aria-selected="false" tabindex="-1">Cursor &amp; andere</button>
+</div>
+
+<div class="panelbox" role="tabpanel" id="p-claude" aria-labelledby="t-claude">
+<h3 class="h">Als Connector hinzufügen</h3>
+<p class="lead">Funktioniert auf claude.ai, in der Desktop-App und auf iPhone und Android. Auch im Free-Plan.</p>
+<div data-needs-remote>
+<div class="copyrow"><code id="remote-url" data-remote-url></code><button class="copy" type="button" data-copy="#remote-url">URL kopieren</button></div>
+<ol class="steps">
+<li><span>In Claude <strong>Anpassen › Connectors</strong> öffnen (auf dem Handy: Einstellungen › Connectors).</span></li>
+<li><span>Auf <strong>+</strong> und dann <strong>Custom Connector hinzufügen</strong> tippen.</span></li>
+<li><span>Name <strong>EASA Regs</strong> eingeben, die URL einfügen, <strong>Hinzufügen</strong>.</span></li>
+<li><span>Fertig. Stell deine Frage, Claude nutzt easa-regs automatisch.</span></li>
+</ol>
+<p class="note">Kein Login nötig. <a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">Anleitung von Anthropic ›</a></p>
+</div>
+<div class="soon" data-no-remote hidden>Der gehostete Connector geht in Kürze online. Bis dahin: <a href="#" data-goto="t-desktop">Claude Desktop</a> oder <a href="#" data-goto="t-code">Claude Code</a> nutzen.</div>
+</div>
+
+<div class="panelbox" role="tabpanel" id="p-desktop" aria-labelledby="t-desktop" hidden>
+<h3 class="h">Ein Klick. Läuft lokal.</h3>
+<p class="lead">Die Erweiterung für Claude Desktop auf Mac und Windows. Python brauchst du nicht, das erledigt Claude.</p>
+<div class="dl"><a class="btn" id="mcpb-link" href="https://github.com/muchsneaks/easa-regs-mcp/releases/latest/download/easa-regs.mcpb" download><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>easa-regs.mcpb laden</a><span style="color:var(--grey);font-size:15px">ca. 30 KB</span></div>
+<ol class="steps">
+<li><span>Datei laden und <strong>doppelt anklicken</strong>.</span></li>
+<li><span>Claude Desktop öffnet sich. Auf <strong>Installieren</strong> klicken.</span></li>
+<li><span>Beim ersten Start lädt easa-regs den Regelindex (ca. 33 MB). Danach sofort einsatzbereit.</span></li>
+</ol>
+<p class="note">Alternativ: Claude Desktop › Einstellungen › Erweiterungen › Erweiterung installieren und die Datei auswählen.</p>
+</div>
+
+<div class="panelbox" role="tabpanel" id="p-code" aria-labelledby="t-code" hidden>
+<h3 class="h">Ein Befehl im Terminal.</h3>
+<p class="lead" data-needs-remote>Über den gehosteten Server, ohne lokale Installation:</p>
+<div class="copyrow" data-needs-remote><code id="cc-remote"></code><button class="copy" type="button" data-copy="#cc-remote">Kopieren</button></div>
+<p class="lead" style="margin-top:22px">Lokal auf deinem Rechner (benötigt <a href="https://docs.astral.sh/uv/">uv</a>):</p>
+<div class="copyrow"><code id="cc-local">claude mcp add easa-regs -- uvx --from git+https://github.com/muchsneaks/easa-regs-mcp easa-regs-mcp</code><button class="copy" type="button" data-copy="#cc-local">Kopieren</button></div>
+</div>
+
+<div class="panelbox" role="tabpanel" id="p-other" aria-labelledby="t-other" hidden>
+<h3 class="h">Jeder MCP-Client.</h3>
+<p class="lead">Cursor, Windsurf, VS Code und weitere.</p>
+<div class="dl" data-needs-remote><a class="btn" id="cursor-link" href="#">Zu Cursor hinzufügen</a></div>
+<p class="lead" style="margin-top:22px">Konfiguration für lokale Ausführung:</p>
+<div class="blockwrap"><pre class="block" id="json-local">{
+  "mcpServers": {
+    "easa-regs": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/muchsneaks/easa-regs-mcp", "easa-regs-mcp"]
+    }
+  }
+}</pre><button class="copy" type="button" data-copy="#json-local">Kopieren</button></div>
+<p class="lead" style="margin-top:22px" data-needs-remote>Oder remote per URL:</p>
+<div class="blockwrap" data-needs-remote><pre class="block" id="json-remote"></pre><button class="copy" type="button" data-copy="#json-remote">Kopieren</button></div>
+</div>
+</div>
+</section>
+
+<!-- TRY -->
+<section class="panel">
+<div class="wrap center">
+<h2 class="h rv">Probier's aus.</h2>
+<p class="sub rv">Kopiere eine Frage und stell sie Claude.</p>
+</div>
+<div class="prompts">
+<div class="prompt rv"><span id="p1">Was brauche ich, um meine SEP-Klassenberechtigung durch Erfahrung zu verlängern? Zitiere die Regel.</span><button class="copy" type="button" data-copy="#p1">Frage kopieren</button></div>
+<div class="prompt rv"><span id="p2">Welche Sichtflugminima gelten im Luftraum G unterhalb von 3.000 ft?</span><button class="copy" type="button" data-copy="#p2">Frage kopieren</button></div>
+<div class="prompt rv"><span id="p3">Welche Kraftstoffreserve brauche ich nach Part-NCO für einen VFR-Flug bei Tag?</span><button class="copy" type="button" data-copy="#p3">Frage kopieren</button></div>
+<div class="prompt rv"><span id="p4">Welche Voraussetzungen hat die Nachtflugberechtigung? Trenne IR, AMC und GM.</span><button class="copy" type="button" data-copy="#p4">Frage kopieren</button></div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+<div class="wrap center"><h2 class="h rv">Häufige Fragen.</h2></div>
+<div class="faq">
+<details><summary>Was ist ein MCP-Server?</summary><p>Das Model Context Protocol (MCP) ist ein offener Standard, über den KI-Assistenten wie Claude externe Werkzeuge nutzen. easa-regs ist so ein Werkzeug: Claude durchsucht damit die EASA-Regelwerke, bevor es antwortet.</p></details>
+<details><summary>Kostet das etwas?</summary><p>Nein. easa-regs ist kostenlos und Open Source (MIT-Lizenz). Du brauchst nur Claude, auch der Free-Plan reicht für einen eigenen Connector.</p></details>
+<details><summary>Ist das offiziell von der EASA?</summary><p>Nein. easa-regs nutzt die offiziellen, maschinenlesbaren Easy Access Rules der EASA, ist aber ein unabhängiges Projekt und nicht rechtsverbindlich. Maßgeblich sind allein die im Amtsblatt der EU veröffentlichten Texte.</p></details>
+<details><summary>Wie aktuell sind die Regeln?</summary><p>Jeden Montag gleicht easa-regs automatisch mit den EASA-Daten ab. Jede Antwort nennt den Revisionsstand, auf dem sie beruht.</p></details>
+<details><summary>Claude nutzt easa-regs nicht. Was tun?</summary><p>Prüfe, ob der Connector im Chat aktiv ist (Menü „+“ › Connectors). Du kannst Claude auch direkt bitten: „Nutze easa-regs und zitiere die Regel.“</p></details>
+<details><summary>Welche Daten werden gespeichert?</summary><p>easa-regs speichert keine Konten und keine Chatverläufe. Beim gehosteten Connector erreicht nur die Suchanfrage selbst den Server. Die lokale Variante läuft komplett auf deinem Rechner.</p></details>
+<details><summary>Sind nationale Vorschriften enthalten?</summary><p>Noch nicht. Enthalten sind die EU-Regelwerke der EASA. Nationale Regeln wie LBA-Vorgaben, NfL oder das AIP gehören nicht dazu.</p></details>
+</div>
+</section>
+
+<!-- CTA -->
+<section class="panel center">
+<div class="wrap">
+<h2 class="h rv" style="font-size:clamp(48px,7vw,96px);line-height:1.02">Weniger suchen.<br>Mehr fliegen.</h2>
+<div class="cta rv"><a class="btn" href="#install">Kostenlos mit Claude verbinden</a><a class="btn ghost" href="https://github.com/muchsneaks/easa-regs-mcp">Auf GitHub ansehen ›</a></div>
+<p class="rv" style="margin:36px 0 0;font-size:15px;color:var(--grey)">Entwickelt von einem Piloten und Fluglehrer.</p>
+</div>
+</section>
+</main>
+
+<footer>
+<div class="wrap">
+<div>1. Dahl, Magesh, Suzgun, Ho: Large Legal Fictions, Stanford RegLab/HAI, 2024. Fehlerquoten 69–88 % bei GPT-3.5, PaLM 2 und Llama 2. <a href="https://hai.stanford.edu/news/hallucinating-law-legal-mistakes-large-language-models-are-pervasive">Quelle</a></div>
+<div>2. Magesh et al.: Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools, Stanford. <a href="https://arxiv.org/abs/2405.20362">Quelle</a></div>
+<div>3. Pre-Flight: A Benchmark for Evaluating LLMs on Aviation Operational Knowledge, 2026. <a href="https://arxiv.org/abs/2607.01829">Quelle</a></div>
+<div>4. EASA Easy Access Rules for Air Operations, Revision 24, März 2026. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-air-operations">Quelle</a></div>
+<div style="margin-top:8px">easa-regs ist inoffiziell und nicht rechtsverbindlich. Vor betrieblichen Entscheidungen immer mit der aktuellen Originalveröffentlichung abgleichen. Regeltexte: EASA Easy Access Rules, © European Union Aviation Safety Agency.</div>
+<div class="bottom"><span>© <span id="year">2026</span> easa-regs · Open Source (MIT)</span><span><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="https://github.com/muchsneaks/easa-regs-mcp">GitHub</a></span></div>
+</div>
+</footer>
+
+<script>
+/* ---- one place to configure the hosted connector ---- */
+const REMOTE_URL = "";   // e.g. "https://easa-regs-mcp.onrender.com/mcp" - leave empty until deployed
+const REPO = "https://github.com/muchsneaks/easa-regs-mcp";
+
+document.documentElement.classList.add("js");
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// remote connector wiring
+const hasRemote = REMOTE_URL.trim().length > 0;
+document.querySelectorAll("[data-needs-remote]").forEach(el => { if (!hasRemote) el.hidden = true; });
+document.querySelectorAll("[data-no-remote]").forEach(el => { el.hidden = hasRemote; });
+if (hasRemote) {
+  document.querySelectorAll("[data-remote-url]").forEach(el => el.textContent = REMOTE_URL);
+  document.getElementById("cc-remote").textContent = `claude mcp add --transport http easa-regs ${REMOTE_URL}`;
+  document.getElementById("json-remote").textContent = JSON.stringify({ mcpServers: { "easa-regs": { url: REMOTE_URL } } }, null, 2);
+  const cfg = btoa(JSON.stringify({ url: REMOTE_URL }));
+  document.getElementById("cursor-link").href = `cursor://anysphere.cursor-deeplink/mcp/install?name=easa-regs&config=${encodeURIComponent(cfg)}`;
+}
+
+// tabs (keyboard accessible)
+const tabs = [...document.querySelectorAll('[role="tab"]')];
+function selectTab(tab, focus) {
+  tabs.forEach(t => {
+    const on = t === tab;
+    t.setAttribute("aria-selected", on);
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+  });
+  if (focus) tab.focus();
+}
+tabs.forEach((t, i) => {
+  t.addEventListener("click", () => selectTab(t));
+  t.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      selectTab(tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length], true);
+    }
+  });
+});
+document.querySelectorAll("[data-goto]").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault(); selectTab(document.getElementById(a.dataset.goto), true);
+}));
+// pick a sensible default: no hosted connector yet -> Desktop; Windows/Mac desktop users see the app tab first otherwise
+if (!hasRemote) selectTab(document.getElementById("t-desktop"));
+
+// copy buttons
+document.querySelectorAll("[data-copy]").forEach(btn => btn.addEventListener("click", async () => {
+  const text = document.querySelector(btn.dataset.copy).textContent.trim();
+  const label = btn.textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = Object.assign(document.createElement("textarea"), { value: text });
+    document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove();
+  }
+  btn.textContent = "Kopiert"; btn.classList.add("done");
+  setTimeout(() => { btn.textContent = label; btn.classList.remove("done"); }, 1800);
+}));
+
+// mobile menu
+const menu = document.querySelector(".menu"), drawer = document.getElementById("drawer");
+menu.addEventListener("click", () => {
+  const open = drawer.classList.toggle("open");
+  menu.setAttribute("aria-expanded", open);
+  menu.setAttribute("aria-label", open ? "Menü schließen" : "Menü öffnen");
+});
+drawer.querySelectorAll("a").forEach(a => a.addEventListener("click", () => { drawer.classList.remove("open"); menu.setAttribute("aria-expanded", false); }));
+
+// scroll reveal
+const io = new IntersectionObserver(entries => entries.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+}), { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+document.querySelectorAll(".rv").forEach(el => io.observe(el));
+</script>
+</body>
+</html>

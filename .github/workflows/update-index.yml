@@ -7,7 +7,9 @@ on:
     branches: [main]
     paths:
       - "src/easa_regs/sources.py"
-      - "src/easa_regs/parse.py"
+      - "src/easa_regs/**"
+      - "mcpb/**"
+      - "scripts/build_mcpb.py"
       - ".github/workflows/update-index.yml"
   schedule:
     - cron: "17 5 * * 1"   # Mondays 05:17 UTC
@@ -46,6 +48,13 @@ jobs:
             grep -E "^(FAILED|ERROR)|Error|assert" pytest.log | head -20 | while read -r l; do echo "::error::$l"; done
             exit 1; }
 
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Build Claude Desktop extension (.mcpb)
+        run: python scripts/build_mcpb.py
+
       - name: Compare with latest release
         id: diff
         env:
@@ -83,5 +92,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="index-$(date -u +%Y-%m-%d-%H%M)"
-          gh release create "$TAG" data/easa_regs.sqlite data/manifest.json \
+          gh release create "$TAG" data/easa_regs.sqlite data/manifest.json dist/easa-regs.mcpb \
             --title "EASA index $(date -u +%Y-%m-%d)" --notes-file notes.md --latest

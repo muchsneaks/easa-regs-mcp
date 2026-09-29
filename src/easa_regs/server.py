@@ -54,7 +54,7 @@ ContentType = Literal["IR", "AMC", "GM", "CS"]
 def _con() -> sqlite3.Connection:
     path = db.db_path()
     # installed copies (not a repo checkout, no EASA_REGS_DB override) refresh the prebuilt index weekly
-    managed = path == db.DEFAULT_DB and not (db._REPO_ROOT / "pyproject.toml").exists()
+    managed = path == db.DEFAULT_DB and not db._is_checkout()
     if managed and path.exists() and time.time() - path.stat().st_mtime > 7 * 86400:
         try:
             download_index(path)
@@ -189,15 +189,50 @@ def disclaimer() -> str:
     return f"{DISCLAIMER}\n{ATTRIBUTION}"
 
 
+LANDING_URL = "https://muchsneaks.github.io/easa-regs-mcp/"
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health(request):  # noqa: ANN001 - starlette request
+    from starlette.responses import JSONResponse
+
+    books = [dict(r) for r in _con().execute("SELECT code, pub_time, n_rules FROM books ORDER BY code")]
+    return JSONResponse({"status": "ok", "books": books})
+
+
+@mcp.custom_route("/", methods=["GET"])
+async def root(request):  # noqa: ANN001
+    from starlette.responses import HTMLResponse
+
+    return HTMLResponse(
+        "<!doctype html><meta charset=utf-8><title>easa-regs MCP</title>"
+        "<body style='font-family:system-ui;max-width:640px;margin:15vh auto;padding:0 20px;line-height:1.6'>"
+        "<h1>easa-regs MCP server</h1><p>This is the MCP endpoint for Claude and other MCP clients: "
+        "<code>/mcp</code>. Add this server's URL ending in <code>/mcp</code> as a custom connector in Claude.</p>"
+        f"<p><a href='{LANDING_URL}'>Setup guide</a></p></body>"
+    )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="EASA Easy Access Rules MCP server")
-    ap.add_argument("--http", action="store_true", help="serve streamable HTTP instead of stdio")
-    ap.add_argument("--host", default="127.0.0.1")
-    ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--http", action="store_true", help="serve streamable HTTP (remote connector) instead of stdio")
+    ap.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
+    ap.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
     args = ap.parse_args()
-    _con()  # fail fast if the index is missing
+    _con()  # fail fast if the index is missing (downloads the prebuilt index on first start)
     if args.http:
+        from mcp.server.transport_security import TransportSecuritySettings
+
         mcp.settings.host, mcp.settings.port = args.host, args.port
+        # stateless JSON responses: every request stands alone, so any instance can answer (hosting-friendly)
+        mcp.settings.stateless_http = True
+        mcp.settings.json_response = True
+        if args.host not in ("127.0.0.1", "localhost", "::1"):
+            # public deployment behind a proxy: the Host header is the public domain, not localhost
+            allowed = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "").split(",") if h.strip()]
+            mcp.settings.transport_security = TransportSecuritySettings(
+                enable_dns_rebinding_protection=bool(allowed), allowed_hosts=allowed, allowed_origins=[]
+            )
         mcp.run(transport="streamable-http")
     else:
         mcp.run()

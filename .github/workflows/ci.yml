@@ -18,3 +18,16 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: pip install -e ".[dev]"
       - run: pytest -q   # real-data tests skip without an index
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build image
+        run: docker build -t easa-regs-mcp .
+      - name: Smoke test
+        run: |
+          docker run -d -p 8000:8000 --name mcp easa-regs-mcp
+          for i in $(seq 1 30); do curl -sf localhost:8000/health && break; sleep 2; done
+          curl -sf localhost:8000/health | grep -q '"status":"ok"'

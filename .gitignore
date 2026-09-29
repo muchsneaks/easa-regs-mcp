@@ -7,3 +7,5 @@ data/raw/
 data/*.sqlite
 data/manifest.json
 data/build_errors.txt
+build/
+dist/

@@ -38,24 +38,24 @@ The index is rebuilt weekly from EASA's official XML by a GitHub Action and publ
 
 ## Install
 
-Needs Python 3.10+. The first start downloads the prebuilt index (~33 MB) from the latest release and refreshes it weekly.
+**Website with one-click setup:** https://muchsneaks.github.io/easa-regs-mcp/
 
-**Claude Desktop** (Settings > Developer > Edit Config), using [uv](https://docs.astral.sh/uv/):
+| Where | How |
+|---|---|
+| **Claude (web, desktop, iOS, Android)** | *Customize › Connectors › + › Add custom connector*, paste the hosted URL (see website). Works on the Free plan too. |
+| **Claude Desktop, local** | Download [`easa-regs.mcpb`](https://github.com/muchsneaks/easa-regs-mcp/releases/latest/download/easa-regs.mcpb), double-click, *Install*. No Python needed. |
+| **Claude Code** | `claude mcp add easa-regs -- uvx --from git+https://github.com/muchsneaks/easa-regs-mcp easa-regs-mcp` |
+| **Any MCP client** | `{"command": "uvx", "args": ["--from", "git+https://github.com/muchsneaks/easa-regs-mcp", "easa-regs-mcp"]}` |
 
-```json
-{
-  "mcpServers": {
-    "easa-regs": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/muchsneaks/easa-regs-mcp", "easa-regs-mcp"]
-    }
-  }
-}
-```
+The first start downloads the prebuilt index (~33 MB) from the latest release and refreshes it weekly.
 
-**Claude Code:** `claude mcp add easa-regs -- uvx --from git+https://github.com/muchsneaks/easa-regs-mcp easa-regs-mcp`
+### Host the remote connector yourself
 
-**Remote / hosted** (streamable HTTP at `/mcp`): `easa-regs-mcp --http --host 0.0.0.0 --port 8000`
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/muchsneaks/easa-regs-mcp)
+
+Or any Docker host: `docker build -t easa-regs-mcp . && docker run -p 8000:8000 easa-regs-mcp`.
+The MCP endpoint is `https://<your-host>/mcp` (stateless streamable HTTP), health check at `/health`.
+Optional `ALLOWED_HOSTS=your.domain` enables DNS-rebinding protection.
 
 ## Develop / build the index yourself
 
@@ -75,6 +75,9 @@ src/easa_regs/
   db.py        SQLite FTS5 index, search + rerank, lookup, AMC/GM links
   build.py     parse + index + manifest.json
   server.py    FastMCP server (stdio or streamable HTTP)
+site/          landing page (GitHub Pages)
+mcpb/          Claude Desktop extension (built by scripts/build_mcpb.py, attached to every release)
+Dockerfile, render.yaml   remote connector hosting
 ```
 
 If EASA changes a download link, update the ID in `sources.py` (the number in
