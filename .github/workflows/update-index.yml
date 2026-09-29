@@ -35,7 +35,7 @@ jobs:
         run: easa-regs-fetch
 
       - name: Build index
-        run: easa-regs-build
+        run: easa-regs-build --keep-going
 
       - name: Full test suite on real data
         run: pytest -q
@@ -60,6 +60,9 @@ jobs:
               elif o["pub_time"] != b["pub_time"] or o["n_rules"] != b["n_rules"]:
                   lines.append(f"- **{code}** updated: {o['pub_time'][:10]} -> {b['pub_time'][:10]}, "
                                f"{o['n_rules']} -> {b['n_rules']} rules")
+          err = pathlib.Path("data/build_errors.txt")
+          if err.exists():
+              lines.append("\n## Books that failed to parse (kept out of this index)\n" + err.read_text())
           pathlib.Path("notes.md").write_text(
               ("## Changes\n" + "\n".join(lines) if lines else "No EASA changes.") +
               "\n\n## Books\n" + "\n".join(f"- {c}: {b['title']} (published {b['pub_time'][:10]}, {b['n_rules']} rules)"

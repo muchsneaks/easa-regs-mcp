@@ -6,3 +6,4 @@ __pycache__/
 data/raw/
 data/*.sqlite
 data/manifest.json
+data/build_errors.txt

@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
+import traceback
 from pathlib import Path
 
 from . import db
@@ -21,6 +23,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("books", nargs="*", help=f"book codes (default: all found). Known: {', '.join(BOOKS)}")
     ap.add_argument("--db", type=Path, default=None, help="SQLite path (default: data/easa_regs.sqlite)")
     ap.add_argument("--raw", type=Path, default=RAW_DIR, help="directory with <CODE>.zip files")
+    ap.add_argument("--keep-going", action="store_true", help="index the other books if one fails to parse")
     args = ap.parse_args(argv)
 
     codes = [c.upper() for c in args.books] or [c for c in BOOKS if (args.raw / f"{c}.zip").exists()]
@@ -29,11 +32,20 @@ def main(argv: list[str] | None = None) -> None:
     target = args.db or db.db_path()
     target.parent.mkdir(parents=True, exist_ok=True)
     con = db.connect(target)
+    failures: dict[str, str] = {}
     for code in codes:
         src = args.raw / f"{code}.zip"
         t0 = time.time()
-        parsed = parse_book(src, code)
-        n = db.store_book(con, parsed)
+        try:
+            parsed = parse_book(src, code)
+            if not parsed.rules:
+                raise ValueError("no rules parsed")
+            n = db.store_book(con, parsed)
+        except Exception as exc:
+            failures[code] = f"{type(exc).__name__}: {exc}"
+            print(f"[{code}] FAILED - {failures[code]}", file=sys.stderr)
+            traceback.print_exc()
+            continue
         types: dict[str, int] = {}
         for r in parsed.rules:
             types[r.content_type] = types.get(r.content_type, 0) + 1
@@ -47,6 +59,13 @@ def main(argv: list[str] | None = None) -> None:
     con.commit()
     con.execute("VACUUM")
     print(f"Index written to {target} ({target.stat().st_size / 1e6:.1f} MB)")
+    errors_file = target.parent / "build_errors.txt"
+    if failures:
+        errors_file.write_text("\n".join(f"{c}: {e}" for c, e in failures.items()) + "\n")
+        if not args.keep_going:
+            raise SystemExit(f"{len(failures)} book(s) failed: {', '.join(failures)}")
+    elif errors_file.exists():
+        errors_file.unlink()
 
 
 if __name__ == "__main__":
