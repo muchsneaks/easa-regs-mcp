@@ -51,9 +51,14 @@ The first start downloads the prebuilt index (~33 MB) from the latest release an
 
 ### Host the remote connector yourself
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/muchsneaks/easa-regs-mcp)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/muchsneaks/easa-regs-mcp)
 
-Or any Docker host: `docker build -t easa-regs-mcp . && docker run -p 8000:8000 easa-regs-mcp`.
+**Vercel / serverless:** `app.py` exposes a lifespan-free ASGI app (`easa_regs.asgi:app`). It downloads the
+prebuilt index to `/tmp` on first use and refreshes it daily, so no build step or redeploy is needed.
+Locally: `uvicorn app:app --port 8000`.
+
+**Docker host:** `docker build -t easa-regs-mcp . && docker run -p 8000:8000 easa-regs-mcp`.
 The MCP endpoint is `https://<your-host>/mcp` (stateless streamable HTTP), health check at `/health`.
 Optional `ALLOWED_HOSTS=your.domain` enables DNS-rebinding protection.
 
@@ -75,8 +80,10 @@ src/easa_regs/
   db.py        SQLite FTS5 index, search + rerank, lookup, AMC/GM links
   build.py     parse + index + manifest.json
   server.py    FastMCP server (stdio or streamable HTTP)
+  asgi.py      serverless ASGI app for the hosted connector
 mcpb/          Claude Desktop extension (built by scripts/build_mcpb.py, attached to every release)
-Dockerfile, render.yaml   remote connector hosting
+app.py, vercel.json       hosted connector on Vercel (serverless)
+Dockerfile, render.yaml   hosted connector on any Docker host
 ```
 
 If EASA changes a download link, update the ID in `sources.py` (the number in
