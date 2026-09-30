@@ -38,7 +38,7 @@ The index is rebuilt weekly from EASA's official XML by a GitHub Action and publ
 
 ## Install
 
-**Website with one-click setup:** https://muchsneaks.github.io/easa-regs-mcp/
+**Website with one-click setup:** https://easa-regs.vercel.app/
 
 | Where | How |
 |---|---|
@@ -75,7 +75,6 @@ src/easa_regs/
   db.py        SQLite FTS5 index, search + rerank, lookup, AMC/GM links
   build.py     parse + index + manifest.json
   server.py    FastMCP server (stdio or streamable HTTP)
-site/          landing page (GitHub Pages)
 mcpb/          Claude Desktop extension (built by scripts/build_mcpb.py, attached to every release)
 Dockerfile, render.yaml   remote connector hosting
 ```

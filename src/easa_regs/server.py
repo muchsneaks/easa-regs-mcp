@@ -189,7 +189,7 @@ def disclaimer() -> str:
     return f"{DISCLAIMER}\n{ATTRIBUTION}"
 
 
-LANDING_URL = "https://muchsneaks.github.io/easa-regs-mcp/"
+LANDING_URL = "https://easa-regs.vercel.app/"
 
 
 @mcp.custom_route("/health", methods=["GET"])
