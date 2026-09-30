@@ -61,7 +61,7 @@ def main() -> None:
             "The index updates itself weekly. Unofficial and not legally binding."
         ),
         "author": {"name": "easa-regs", "url": "https://github.com/muchsneaks/easa-regs-mcp"},
-        "homepage": "https://easa-regs.vercel.app/",
+        "homepage": "https://easa-regs-site.vercel.app/",
         "documentation": "https://github.com/muchsneaks/easa-regs-mcp#readme",
         "support": "https://github.com/muchsneaks/easa-regs-mcp/issues",
         "repository": {"type": "git", "url": "https://github.com/muchsneaks/easa-regs-mcp"},

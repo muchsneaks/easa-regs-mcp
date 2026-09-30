@@ -38,7 +38,7 @@ The index is rebuilt weekly from EASA's official XML by a GitHub Action and publ
 
 ## Install
 
-**Website with one-click setup:** https://easa-regs.vercel.app/
+**Website with one-click setup:** https://easa-regs-site.vercel.app/
 
 | Where | How |
 |---|---|
