@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy – easa-regs</title>
+<meta name="description" content="Privacy policy of easa-regs, the EASA rulebook as an MCP server.">
+<link rel="alternate" hreflang="de" href="https://muchsneaks.github.io/easa-regs-mcp/datenschutz.html">
+<link rel="alternate" hreflang="en" href="https://muchsneaks.github.io/easa-regs-mcp/en/privacy.html">
+<link rel="icon" href="../assets/icon.png">
+<style>
+@font-face{font-family:Geist;src:url(../assets/fonts/Geist-Variable.woff2) format("woff2");font-weight:100 900;font-display:swap}
+body{margin:0;font-family:Geist,-apple-system,sans-serif;color:#1D1D1F;background:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}
+main{width:min(720px,100% - 48px);margin:72px auto 96px}
+h1{font-size:clamp(36px,7vw,48px);letter-spacing:-.035em;font-weight:600;margin:24px 0 32px;line-height:1.1}
+h2{font-size:21px;letter-spacing:-.01em;margin:44px 0 8px}
+p,li{color:#1D1D1F}a{color:#0066D6;overflow-wrap:anywhere}
+ul{padding-left:20px}
+.top{display:flex;justify-content:space-between;gap:16px;font-size:14px}
+.lead{font-size:19px;color:#424245}
+.note{background:#F5F5F7;border-radius:14px;padding:12px 16px;font-size:15px;color:#424245}
+.box{background:#F5F5F7;border-radius:14px;padding:16px 20px;margin:16px 0}
+.box p{margin:6px 0}
+.muted{color:#6E6E73;font-size:14px}
+footer{border-top:1px solid #D2D2D7;margin-top:56px;padding-top:20px;display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px}
+footer a{color:#6E6E73;text-decoration:none}footer a:hover{color:#1D1D1F}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><a href="./">‹ Back to easa-regs</a><a href="../datenschutz.html" hreflang="de" lang="de">Deutsch</a></div>
+<h1>Privacy policy</h1>
+<p class="note">This is a translation for convenience. The <a href="../datenschutz.html" hreflang="de">German version (Datenschutzerklärung)</a> is the legally binding one.</p>
+
+<p class="lead">In short: this website uses no cookies, no tracking and no analytics, and loads nothing from third parties. The hosted connector keeps no accounts, receives no chat history and does not log requests.</p>
+
+<h2>1. Controller</h2>
+<p>The controller for data processing on this website and for the hosted connector within the meaning of the General Data Protection Regulation (GDPR) is:</p>
+<p>Til Francis Taubert<br>Mittelweg 1<br>98617 Meiningen OT Walldorf<br>Germany<br>Email: <a href="mailto:til.taubert@studio-sera.de">til.taubert@studio-sera.de</a></p>
+<p>No data protection officer has been appointed, as there is no legal obligation to do so.</p>
+
+<h2>2. Visiting this website (hosting on GitHub Pages)</h2>
+<p>This website is served by GitHub Pages, a service of GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA, through a global content delivery network.</p>
+<p>When you visit the website, GitHub automatically processes data your browser sends that is technically required to deliver and secure the site, in particular your IP address, date and time of access, the page requested, the amount of data transferred, the referrer and browser and operating system information (server log files). GitHub uses this data to provide the service and to defend against attacks. I have no access to these log files and receive no visitor statistics.</p>
+<p><strong>Legal basis</strong> is Art. 6(1)(f) GDPR. My legitimate interest is providing the website securely, reliably and free of charge.</p>
+<p><strong>Transfers to third countries:</strong> Data may be transferred to the USA. GitHub, Inc. is certified under the EU-US Data Privacy Framework; transfers rely on the European Commission's adequacy decision of 10 July 2023 (Art. 45 GDPR). More information: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub General Privacy Statement</a>.</p>
+
+<h2>3. No cookies, no tracking, no external content</h2>
+<p>This website uses no cookies, no analytics or marketing tools, no social media plugins and no embedded videos. Fonts and images are loaded from the same server as the website itself; nothing is loaded from Google Fonts or other third parties.</p>
+
+<h2>4. Language selection</h2>
+<p>On your first visit the website reads the language set in your browser to show you the German or English version. This happens only inside your browser; the information is neither transmitted nor stored.</p>
+<p>If you actively switch the language, the website stores your choice ("de" or "en") in your browser's local storage (localStorage) so it is kept on your next visit. This entry never leaves your device and is not sent to me. Storing it is strictly necessary for the service you explicitly requested (§ 25 (2) no. 2 TDDDG); the legal basis for processing is Art. 6(1)(f) GDPR. You can delete the entry at any time by clearing this site's data in your browser.</p>
+
+<h2>5. Hosted connector (remote MCP server)</h2>
+<p>If you add easa-regs as a connector in Claude or another AI application (MCP client), the application calls the easa-regs tools when needed. The following is sent to the server:</p>
+<ul>
+<li>the content of the tool call, i.e. the search query or rule reference the AI derives from your question (e.g. "SEP revalidation" or "FCL.740.A") and optional filters;</li>
+<li>technical connection data, in particular the IP address of the calling system and the time of the request.</li>
+</ul>
+<p>With Claude.ai and the Claude apps, calls are usually made from Anthropic's servers, so the server normally does not see your own IP address. With locally running applications (e.g. Claude Code, Cursor) the request is sent directly from your device.</p>
+<p>The server answers the request from the public EASA rule index and then forgets it. It is stateless, creates no user accounts, receives no chat history and logs neither requests nor IP addresses. Still, please avoid putting unnecessary personal data into questions answered via the connector, as the AI may pass parts of your question on as a search term.</p>
+<p><strong>Hosting:</strong> The server runs at Render Services, Inc., San Francisco, USA, in the Frankfurt am Main data centre region. Render processes the connection data as a processor under a contract pursuant to Art. 28 GDPR (<a href="https://render.com/dpa">Data Processing Addendum</a>) and may log it briefly to operate and secure its platform. Render Services, Inc. is certified under the EU-US Data Privacy Framework (Art. 45 GDPR). More information: <a href="https://render.com/privacy">Render Privacy Policy</a>.</p>
+<p><strong>Legal basis</strong> is Art. 6(1)(f) GDPR. My legitimate interest is delivering the rule texts you requested and operating the service securely.</p>
+<p>The provider of the AI application itself (e.g. Anthropic for Claude) is solely responsible for how it processes your conversations, under its own privacy policy; for Anthropic, see the <a href="https://www.anthropic.com/legal/privacy">Anthropic Privacy Policy</a>.</p>
+
+<h2>6. Claude Desktop extension and local installation</h2>
+<p>The Claude Desktop extension and the local installation run entirely on your computer; your queries are not sent to easa-regs. On first start and at most once a week afterwards, the program downloads the public rule index from GitHub. GitHub, Inc. technically receives your IP address and the usual connection data. The legal basis is Art. 6(1)(f) GDPR (keeping the rule texts current); for third-country transfers see section 2.</p>
+
+<h2>7. GitHub repository and downloads</h2>
+<p>Source code, releases and the extension file are provided on GitHub. If you follow links to GitHub or download files there, GitHub, Inc. processes your data as an independent controller under the GitHub privacy statement linked above.</p>
+
+<h2>8. Links to other websites</h2>
+<p>This website links to external sites, e.g. EASA, Anthropic, Cursor, arXiv and Stanford University. They are only loaded when you click a link; from then on the respective provider's privacy policy applies.</p>
+
+<h2>9. Contact by email</h2>
+<p>If you email me, I process your email address, your name (if given) and the content of your message to answer your enquiry. The legal basis is Art. 6(1)(b) GDPR where your enquiry concerns a contract or pre-contractual steps, otherwise Art. 6(1)(f) GDPR (legitimate interest in answering enquiries). I delete the data once your enquiry has been fully dealt with, unless statutory retention obligations apply. Emails are stored with my email provider, acting as a processor.</p>
+
+<h2>10. Retention</h2>
+<p>I store personal data only as long as necessary for the respective purpose or as required by statutory retention periods. The connector server stores no requests. Hosting providers delete their server log files automatically according to their own retention periods.</p>
+
+<h2>11. Your rights</h2>
+<p>You have the following rights regarding personal data concerning you:</p>
+<ul>
+<li>Right of access (Art. 15 GDPR)</li>
+<li>Right to rectification (Art. 16 GDPR)</li>
+<li>Right to erasure (Art. 17 GDPR)</li>
+<li>Right to restriction of processing (Art. 18 GDPR)</li>
+<li>Right to data portability (Art. 20 GDPR)</li>
+</ul>
+<div class="box">
+<p><strong>Right to object (Art. 21 GDPR)</strong></p>
+<p>Where I process data on the basis of Art. 6(1)(f) GDPR, you have the right to object to this processing at any time on grounds relating to your particular situation. I will then no longer process the data unless I can demonstrate compelling legitimate grounds for the processing which override your interests, rights and freedoms, or the processing serves the establishment, exercise or defence of legal claims. An informal email to the address above is sufficient.</p>
+</div>
+<p>You also have the right to lodge a complaint with a data protection supervisory authority (Art. 77 GDPR), in particular in the member state of your habitual residence, place of work or place of the alleged infringement.</p>
+
+<h2>12. Further information</h2>
+<p>You are under no statutory or contractual obligation to provide personal data. Without the technically necessary connection data, however, the website or connector cannot be delivered. There is no automated decision-making, including profiling, within the meaning of Art. 22 GDPR.</p>
+<p>I update this privacy policy when the website, the connector or the law changes. The version published here applies.</p>
+
+<p class="muted">Last updated: 30 September 2026</p>
+
+<footer><a href="./">Home</a><a href="legal.html">Legal notice</a><a href="../datenschutz.html" hreflang="de" lang="de">Datenschutz (Deutsch)</a><a href="https://github.com/muchsneaks/easa-regs-mcp">GitHub</a></footer>
+</main>
+</body>
+</html>

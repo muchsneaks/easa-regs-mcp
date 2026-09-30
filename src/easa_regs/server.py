@@ -233,7 +233,10 @@ def main() -> None:
             mcp.settings.transport_security = TransportSecuritySettings(
                 enable_dns_rebinding_protection=bool(allowed), allowed_hosts=allowed, allowed_origins=[]
             )
-        mcp.run(transport="streamable-http")
+        import uvicorn
+
+        # data minimisation: no access log, so the server never records client IPs or request lines
+        uvicorn.run(mcp.streamable_http_app(), host=args.host, port=args.port, access_log=False, log_level="warning")
     else:
         mcp.run()
 
