@@ -42,7 +42,7 @@ The index is rebuilt weekly from EASA's official XML by a GitHub Action and publ
 
 | Where | How |
 |---|---|
-| **Claude (web, desktop, iOS, Android)** | *Customize › Connectors › + › Add custom connector*, paste the hosted URL (see website). Works on the Free plan too. |
+| **Claude (web, desktop, iOS, Android)** | *Customize › Connectors › + › Add custom connector*, paste `https://easa-regs-mcp.vercel.app/mcp`. Works on the Free plan too. |
 | **Claude Desktop, local** | Download [`easa-regs.mcpb`](https://github.com/muchsneaks/easa-regs-mcp/releases/latest/download/easa-regs.mcpb), double-click, *Install*. No Python needed. |
 | **Claude Code** | `claude mcp add easa-regs -- uvx --from git+https://github.com/muchsneaks/easa-regs-mcp easa-regs-mcp` |
 | **Any MCP client** | `{"command": "uvx", "args": ["--from", "git+https://github.com/muchsneaks/easa-regs-mcp", "easa-regs-mcp"]}` |
