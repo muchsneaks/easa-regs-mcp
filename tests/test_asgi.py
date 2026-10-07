@@ -33,8 +33,8 @@ async def test_asgi_app_without_lifespan(sample_db):
         assert {"search_easa_rules", "get_easa_rule", "browse_easa_toc", "list_easa_sources"} <= names
 
         r = await client.post("/mcp", headers=HEADERS, content=_rpc(
-            "tools/call", {"name": "get_easa_rule", "arguments": {"ref": "FCL.740.A"}}, id_=3))
-        assert "FCL.740.A" in r.json()["result"]["content"][0]["text"]
+            "tools/call", {"name": "get_easa_rule", "arguments": {"ref": "SERA.5005"}}, id_=3))
+        assert '"found": true' in r.json()["result"]["content"][0]["text"]
 
         assert (await client.get("/health")).json()["status"] == "ok"
         assert (await client.get("/")).status_code == 200
