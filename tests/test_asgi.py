@@ -39,6 +39,9 @@ async def test_asgi_app_without_lifespan(sample_db):
         assert (await client.get("/health")).json()["status"] == "ok"
         assert (await client.get("/")).status_code == 200
         assert (await client.get("/nope")).status_code == 404
+        # no long-lived SSE stream (it kept serverless instances busy around the clock)
+        r = await client.get("/mcp", headers={"accept": "text/event-stream"})
+        assert r.status_code == 405 and r.headers["allow"] == "POST"
     _con.cache_clear()
 
 

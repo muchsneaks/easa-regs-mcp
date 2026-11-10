@@ -3,7 +3,7 @@
   "regions": ["fra1"],
   "functions": {
     "app.py": {
-      "maxDuration": 60,
+      "maxDuration": 30,
       "excludeFiles": "{tests/**,mcpb/**,scripts/**,site/**,data/**,dist/**,build/**,.github/**}"
     }
   }

@@ -167,7 +167,13 @@ async def app(scope, receive, send) -> None:  # noqa: ANN001
     if scope["type"] != "http":
         return
     path = scope["path"].rstrip("/") or "/"
-    if path == "/mcp":
+    if path == "/mcp" and scope["method"] in ("GET", "DELETE"):
+        # No standalone SSE stream: an open GET would keep a serverless instance (and its memory) busy for
+        # as long as the client stays connected. The MCP spec allows 405 here; clients then only use POST.
+        await send({"type": "http.response.start", "status": 405,
+                    "headers": [(b"allow", b"POST"), (b"content-type", b"text/plain; charset=utf-8")]})
+        await send({"type": "http.response.body", "body": b"Use POST. This server offers no SSE stream."})
+    elif path == "/mcp":
         _ensure_index()
         scope = dict(scope, path="/mcp")
         await _mcp(scope, receive, send)
